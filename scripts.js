@@ -117,48 +117,36 @@ function createPreview(bookData) {
 }
 
 /**
- *  fragment creates an empty document fragment that can be used to hold DOM elements without actually appending them to the main document.
- *  const extracted = matches; creates a new variable extracted and assigns it the value of the matches array.
- *  for loop iterates through each item in the extracted array
- *  Inside the loop, a preview element is created using the createPreview function.
- *  The properties authors, image, title, and id are passed as arguments to the function to create the preview with the corresponding data.
- *  The created preview element is then appended to the fragment using fragment.appendChild(preview).
+ * we use document.querySelector to get the element with the attribute data-list-items 
+ * (which is the element you want to append to).
+ *  We then check if listItems is not null before attempting to append the fragment.
  */
 
-const fragment = document.createDocumentFragment()
-const extracted = matches;
+document.addEventListener('DOMContentLoaded', function () {
+    const fragment = document.createDocumentFragment();
+    const extracted = matches;
 
-for (const book of extracted) {
-    const preview = createPreview({
-        authors: book.author,
-        id: book.id,
-        image: book.image,
-        title: book.title
-    });
+    for (const book of extracted) {
+        const preview = createPreview({
+            authors: book.author,
+            id: book.id,
+            image: book.image,
+            title: book.title
+        });
 
-    fragment.appendChild(preview);
-}
+        fragment.appendChild(preview);
+    }
 
-// Append the fragment to the list
-const listItems = document.querySelector('.list__items');
-listItems.appendChild(fragment);
+    // Get the element to which you want to append the fragment
+    const listItems = document.querySelector('[data-list-items]');
+
+    // Check if the element exists before appending the fragment
+    if (listItems) {
+        listItems.appendChild(fragment);
+    }
+});
 
 
-
-// data - list - items.appendChild(fragment)
-
-// genres = document.createDocumentFragment()
-// element = document.createElement('option')
-// element.value = 'any'
-// element = 'All Genres'
-// genres.appendChild(element)
-
-// for ([id, name]; Object.entries(genres); i++) {
-//     document.createElement('option')
-//     element.value = value
-//     element.innerText = text
-//     genres.appendChild(element)
-// }
 
 // data - search - genres.appendChild(genres)
 
