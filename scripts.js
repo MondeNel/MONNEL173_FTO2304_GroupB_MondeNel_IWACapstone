@@ -15,18 +15,6 @@ if (!matches || !Array.isArray(books)) throw new Error('Source required');
 if (!range || range.length < 2) throw new Error('Range must be an array with two numbers');
 
 
-// Define Theme Color Values:
-
-const day = {
-    dark: '10, 10, 20',
-    light: '255, 255, 255',
-}
-
-const night = {
-    dark: '255, 255, 255',
-    light: '10, 10, 20',
-}
-
 
 /** ===================================== Create Preview Elements ============================================*/
 
@@ -236,6 +224,32 @@ if (searchGenresContainer) {
 
 
 
+/** =============================================== data-search-authors ====================================  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -297,28 +311,13 @@ if (searchAuthorsSelect) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** ================================================= Theme Settings ================================================= */
 
+/**
+ * This event listener is triggered when the DOM content is fully loaded.
+ */
 document.addEventListener('DOMContentLoaded', function () {
+
     // Get the theme setting value from the form
     const dataSettingsTheme = document.querySelector('[data-settings-theme]').value;
 
@@ -326,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDarkModePreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     // Set the theme to either 'night' or 'day' based on user preference
-    const theme = isDarkModePreferred ? 'night' : 'day';
+    let theme = isDarkModePreferred ? 'night' : 'day';
 
     // Define CSS colors for day and night themes
     const themeColors = {
@@ -340,6 +339,24 @@ document.addEventListener('DOMContentLoaded', function () {
         },
     };
 
+    /**
+     * Function to toggle the theme between day and night.
+     * It updates the CSS variables for the theme colors.
+     */
+    function toggleTheme() {
+        theme = theme === 'day' ? 'night' : 'day';
+        document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
+        document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
+    }
+
+    // Get the data-header-settings element for theme toggle
+    const dataHeaderSettings = document.querySelector('[data-header-settings]');
+
+    // Attach the toggleTheme function to the data-header-settings element's click event
+    if (dataHeaderSettings) {
+        dataHeaderSettings.addEventListener('click', toggleTheme);
+    }
+
     // Apply the selected theme colors to the document
     document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
     document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
@@ -349,13 +366,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dataListButton) {
         const remainingBooks = books.length - (page * BOOKS_PER_PAGE);
         const remainingText = remainingBooks > 0 ? remainingBooks : 0;
+
+        // Set the innerHTML of the "Show more" button with the remaining books count
         dataListButton.innerHTML = `<span>Show more</span><span class="list__remaining">(${remainingText})</span>`;
+
+        // Disable the "Show more" button if there are no remaining books
         dataListButton.disabled = !(remainingBooks > 0);
 
         // Attach the loadMoreBooks function to the "Show more" button's click event
         dataListButton.addEventListener('click', loadMoreBooks);
     }
 });
+
+
+
 
 
 
@@ -494,6 +518,9 @@ document.querySelector('[data-header-search]').addEventListener('click', functio
     // Set focus to the title input for better user experience
     searchTitle.focus();
 });
+
+
+
 
 
 
