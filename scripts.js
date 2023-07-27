@@ -108,6 +108,25 @@ function createPreview(bookData) {
     preview.appendChild(info);
 
 
+    /**
+     * Allow the user to read a summary of the book:
+     */
+    // const summaryElement = document.createElement('div');
+    // summaryElement.classList.add('preview__summary');
+    // summaryElement.textContent = bookData.summary;
+
+    // info.appendChild(summaryElement);
+
+    /**
+     * Display the publication date of the book:
+     */
+    // const publicationDateElement = document.createElement('div');
+    // publicationDateElement.classList.add('preview__publication-date');
+    // publicationDateElement.textContent = `Published: ${bookData.publicationDate}`;
+
+    // info.appendChild(publicationDateElement);
+
+
 
     return preview;
 }
@@ -115,6 +134,21 @@ function createPreview(bookData) {
 
 
 /** ===================================== Show more button - data-list-button =================================*/
+
+
+function loadInitialBooks() {
+    const dataListButton = document.querySelector('[data-list-button]');
+    dataListButton.addEventListener('click', loadMoreBooks);
+
+    loadMoreBooks();
+}
+
+// Load the initial books when the DOM content is fully loaded
+document.addEventListener('DOMContentLoaded', loadInitialBooks);
+
+
+
+
 
 function loadMoreBooks() {
     // Calculate the range of books to extract for the current page
@@ -224,31 +258,6 @@ if (searchGenresContainer) {
 
 
 
-/** =============================================== data-search-authors ====================================  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -306,21 +315,9 @@ if (searchAuthorsSelect) {
 
 
 
-
-
-
-
-
 /** ================================================= Theme Settings ================================================= */
 
-/**
- * This event listener is triggered when the DOM content is fully loaded.
- */
 document.addEventListener('DOMContentLoaded', function () {
-
-    // Get the theme setting value from the form
-    const dataSettingsTheme = document.querySelector('[data-settings-theme]').value;
-
     // Check if the user prefers dark mode
     const isDarkModePreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -349,12 +346,73 @@ document.addEventListener('DOMContentLoaded', function () {
         document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
     }
 
+    // Function to show the theme selection dialog
+    function showThemeSelectionDialog() {
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        const overlayButtons = document.querySelector('.overlay__buttons');
+        const dataListMessage = document.querySelector('[data-list-message]');
+
+        if (themeDialog && overlayButtons && dataListMessage) {
+            // Hide the "No results found" message
+            dataListMessage.style.display = 'none';
+
+            // Show the overlay buttons
+            overlayButtons.style.display = 'flex';
+
+            // Show the theme selection dialog
+            themeDialog.showModal();
+        }
+    }
+
+    // Function to handle the theme selection and save it
+    function handleThemeSelectionAndSave(event) {
+        event.preventDefault();
+
+        const selectedTheme = document.querySelector('[data-settings-theme]').value;
+        if (selectedTheme === 'day' || selectedTheme === 'night') {
+            // Save the user's theme preference to local storage
+            localStorage.setItem('themePreference', selectedTheme);
+
+            // Update the theme based on the user's selection
+            theme = selectedTheme;
+            document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
+            document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
+        }
+
+        // Close the theme selection dialog
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        themeDialog.close();
+    }
+
+    // Function to handle the cancel button click and hide the dialog
+    function handleCancelButtonClick(event) {
+        event.preventDefault();
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        themeDialog.close();
+    }
+
     // Get the data-header-settings element for theme toggle
     const dataHeaderSettings = document.querySelector('[data-header-settings]');
 
     // Attach the toggleTheme function to the data-header-settings element's click event
     if (dataHeaderSettings) {
-        dataHeaderSettings.addEventListener('click', toggleTheme);
+        dataHeaderSettings.addEventListener('click', showThemeSelectionDialog);
+    }
+
+    // Get the theme selection form
+    const themeSelectionForm = document.querySelector('[data-settings-form]');
+
+    // Attach the handleThemeSelectionAndSave function to the form's submit event
+    if (themeSelectionForm) {
+        themeSelectionForm.addEventListener('submit', handleThemeSelectionAndSave);
+    }
+
+    // Get the cancel button
+    const cancelButton = document.querySelector('[data-cancel-button]');
+
+    // Attach the handleCancelButtonClick function to the cancel button's click event
+    if (cancelButton) {
+        cancelButton.addEventListener('click', handleCancelButtonClick);
     }
 
     // Apply the selected theme colors to the document
@@ -376,7 +434,27 @@ document.addEventListener('DOMContentLoaded', function () {
         // Attach the loadMoreBooks function to the "Show more" button's click event
         dataListButton.addEventListener('click', loadMoreBooks);
     }
+
 });
+
+
+
+/** ========================================== data-settings-form ==================================== */
+
+const settingsForm = document.querySelector('[data-settings-form]');
+
+function handleSettingsFormSubmit(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+}
+
+settingsForm.addEventListener('submit', handleSettingsFormSubmit);
+
+const searchForm = document.querySelector('[data-search-form]');
+
+// Add an event listener to the search form's submit button
+searchForm.addEventListener('submit', handleSearchFormSubmit);
+
+
 
 
 
@@ -400,17 +478,8 @@ searchCancelButton.addEventListener('click', handleSearchCancelButtonClick);
 
 
 
-/** ========================================== data-settings-form ==================================== */
 
-const settingsForm = document.querySelector('[data-settings-form]');
 
-function handleSettingsFormSubmit(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-    // Your code to handle the form submission goes here
-    actions.settings.submit(); // Call the function to handle form submission
-}
-
-settingsForm.addEventListener('submit', handleSettingsFormSubmit);
 
 
 /** ========================================== data-list-close ==================================== */
@@ -541,7 +610,6 @@ function handleSearchFormSubmit(event) {
         let genreMatch = true;
 
         if (filters.genre !== 'any') {
-
             genreMatch = book.genres.includes(filters.genre);
         }
 
@@ -554,12 +622,14 @@ function handleSearchFormSubmit(event) {
     updateBookList(results);
 }
 
+
 // Implement the function to update the book list
 function updateBookList(results) {
     // Get references to the required elements
     const dataListItems = document.querySelector('[data-list-items]');
     const dataListButton = document.querySelector('[data-list-button]');
     const dataSearchOverlay = document.querySelector('[data-search-overlay]');
+    const dataListMessage = document.querySelector('[data-list-message]');
 
     // Calculate the remaining books count to be displayed in the 'Show more' button
     const remainingBooks = results.length - (page * BOOKS_PER_PAGE);
@@ -605,6 +675,17 @@ function updateBookList(results) {
     // Append the fragment to the 'data-list-items' container
     dataListItems.appendChild(fragment);
 
+    // Show or hide the "No results found" message based on the presence of search results
+    if (dataListMessage) {
+        dataListMessage.style.display = results.length === 0 ? 'block' : 'none';
+    }
+
+    // Show or hide the overlay buttons based on the presence of search results
+    if (dataListButton && dataListMessage) {
+        dataListButton.style.display = results.length > 0 ? 'block' : 'none';
+        dataListMessage.style.display = results.length === 0 ? 'block' : 'none';
+    }
+
     // Scroll to the top of the page smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -613,33 +694,6 @@ function updateBookList(results) {
         dataSearchOverlay.open = false;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -690,24 +744,6 @@ document.querySelector('[data-list-button]').innerHTML = /* html */ `
 
 window.scrollTo({ top: 0, behavior: 'smooth' });
 document.querySelector('[data-search-overlay]').open = false;
-
-
-
-
-
-
-
-/** =============================================== data - settings - overlay.submit ===============================  */
-
-document.querySelector('[data-settings-overlay]').addEventListener('submit', function (event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const result = Object.fromEntries(formData);
-    document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-    document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-    document.querySelector('[data-settings-overlay]').open = false;
-});
-
 
 
 

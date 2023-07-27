@@ -94,6 +94,7 @@
 
     <main class="list">
       <div class="list__items" data-list-items></div>
+      <div class="previews-container" data-list-items></div>
       <div class="list__message" data-list-message>No results found. Your filters might be too narrow.</div>
       <button class="list__button" data-list-button></button>
     </main>
@@ -140,18 +141,27 @@
       </div>
     </dialog>
 
+  
     <dialog class="overlay" data-settings-overlay>
       <div class="overlay__content">
         <form class="overlay__form" data-settings-form id="settings">
           <label class="overlay__field">
             <div class="overlay__label">Theme</div>
-
             <select class="overlay__input overlay__input_select" data-settings-theme name="theme">
               <option value="day">Day</option>
               <option value="night">Night</option>
             </select>
           </label>
+          <div class="overlay__buttons">
+            <button class="overlay__button overlay__button_cancel" data-cancel-button>Cancel</button>
+            <button class="overlay__button overlay__button_save" type="submit">Save</button>
+          </div>
         </form>
+      </div>
+    </dialog>
+
+
+
 
         <div class="overlay__row">
           <button class="overlay__button" data-settings-cancel>Cancel</button>
