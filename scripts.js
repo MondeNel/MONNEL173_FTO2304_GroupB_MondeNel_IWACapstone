@@ -108,25 +108,6 @@ function createPreview(bookData) {
     preview.appendChild(info);
 
 
-    /**
-     * Allow the user to read a summary of the book:
-     */
-    // const summaryElement = document.createElement('div');
-    // summaryElement.classList.add('preview__summary');
-    // summaryElement.textContent = bookData.summary;
-
-    // info.appendChild(summaryElement);
-
-    /**
-     * Display the publication date of the book:
-     */
-    // const publicationDateElement = document.createElement('div');
-    // publicationDateElement.classList.add('preview__publication-date');
-    // publicationDateElement.textContent = `Published: ${bookData.publicationDate}`;
-
-    // info.appendChild(publicationDateElement);
-
-
 
     return preview;
 }
