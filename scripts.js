@@ -592,9 +592,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /**
-     * 
-     */
     const themeSelectionForm = document.querySelector('[data-settings-form]');
 
     // Attach the handleThemeSelectionAndSave function to the form's submit event
