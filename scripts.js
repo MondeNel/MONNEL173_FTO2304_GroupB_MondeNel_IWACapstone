@@ -15,18 +15,6 @@ if (!matches || !Array.isArray(books)) throw new Error('Source required');
 if (!range || range.length < 2) throw new Error('Range must be an array with two numbers');
 
 
-// Define Theme Color Values:
-
-const day = {
-    dark: '10, 10, 20',
-    light: '255, 255, 255',
-}
-
-const night = {
-    dark: '255, 255, 255',
-    light: '10, 10, 20',
-}
-
 
 /** ===================================== Create Preview Elements ============================================*/
 
@@ -126,46 +114,134 @@ function createPreview(bookData) {
 
 
 
-/** ===================================== Show more button - data-list-button =================================*/
 
+
+
+
+
+
+/** ===================================== Show more button - data-list-button ======================================*/
+
+/**
+ * This is a function declaration named loadInitialBooks. 
+ * It is responsible for loading the initial set of books when the page's DOM content is fully loaded.
+ */
+function loadInitialBooks() {
+
+    /**
+     * This line retrieves a reference to the HTML element with the attribute data-list-button. 
+     * This element represents the "Show more" button that users can click to load additional books.
+     */
+    const dataListButton = document.querySelector('[data-list-button]');
+
+
+    /**
+     * This line attaches an event listener to the "Show more" button. When the button is clicked,
+     *  the loadMoreBooks function will be executed.
+     *  This allows users to load more books by clicking the button.
+     */
+    dataListButton.addEventListener('click', loadMoreBooks);
+
+
+
+    /**
+     * After setting up the event listener, this line immediately calls the loadMoreBooks function to 
+     * load the initial set of books on the page.
+     * This ensures that some books are displayed when the page is loaded.
+     */
+    loadMoreBooks();
+}
+
+/**
+ * This line adds an event listener to the DOMContentLoaded event of the document object. 
+ * When the DOM content is fully loaded (i.e., when the page has finished loading), 
+ * the loadInitialBooks function will be called to load the initial set of books.
+ */
+document.addEventListener('DOMContentLoaded', loadInitialBooks);
+
+
+/**
+ * This is a function declaration named loadMoreBooks.
+ * It is responsible for loading and displaying more books on the page when the "Show more" button is clicked.
+ */
 function loadMoreBooks() {
-    // Calculate the range of books to extract for the current page
+
+    /**
+     * These two lines calculate the starting and ending indices of the books to be displayed on the current page.
+     * The starting index is calculated as (page - 1) * BOOKS_PER_PAGE,
+     * and the ending index is calculated as page * BOOKS_PER_PAGE.
+     */
     const rangeStart = (page - 1) * BOOKS_PER_PAGE;
     const rangeEnd = page * BOOKS_PER_PAGE;
 
-    // Extract the books for the current page
+
+    /**
+     * This line uses the slice method on the books array to extract the books for the current page. 
+     * The slice method returns a new array containing elements from the books array within the specified range.
+     */
     const extracted = books.slice(rangeStart, rangeEnd);
 
-    // Create a fragment to hold the new book previews
+    /**
+     *  It is used to temporarily store the book previews before appending them to the page.
+     *  Using a DocumentFragment improves performance when appending multiple elements to the DOM.
+     */
     const fragment = document.createDocumentFragment();
 
-    // Loop through each book in the extracted list and create a preview for it
-    for (const props of extracted) {
-        // Call the createPreview function to create a preview for the book
+    /**
+     * This is a for...of loop that iterates through each book in the extracted array.
+     */
+    for (const book of extracted) {
+
+        /**
+         * This line calls the createPreview function with an object containing the book's information 
+         * (authors, id, image, title, and genre). 
+         * The createPreview function returns an HTML element representing a preview of the book.
+         */
         const preview = createPreview({
-            authors: props.author,
-            id: props.id,
-            image: props.image,
-            title: props.title,
-            genre: props.genre,
+            authors: book.author,
+            id: book.id,
+            image: book.image,
+            title: book.title,
+            genre: book.genre,
         });
 
-        // Append the preview to the fragment
+        /**
+         * This line appends the book preview (HTML element) to the DocumentFragment called fragment.
+         * The DocumentFragment allows the previews to be 
+         * added without triggering multiple reflows in the DOM, which improves performance.
+         */
         fragment.appendChild(preview);
     }
 
-    // Get a reference to the container where the previews will be displayed
+    /**
+     * This line retrieves a reference to the HTML element with the attribute data-list-items. 
+     * This element represents the container where the book previews will be displayed.
+     */
     const listItemsContainer = document.querySelector('[data-list-items]');
 
-    // Check if the container exists and append the fragment to it
+    /**
+     * This block of code checks if the listItemsContainer exists (i.e., if the container element is found).
+     *  If it does exist, it appends the fragment containing the book previews to the container.
+     *  This displays the new book previews on the page.
+     */
     if (listItemsContainer) {
         listItemsContainer.appendChild(fragment);
     }
 
-    // Update the page number for the next load
+    /**
+     * This line increments the page variable, which keeps track of the current page number. 
+     * This ensures that the next time the "Show more" button is clicked, the next set of books will be loaded.
+     */
     page++;
 
-    // Update the "Show more" button with the correct remaining books count and disable it when no more books to show
+
+    /**
+     *  This block of code updates the "Show more" button with the correct text displaying the number of remaining books.
+        If there are no more books to show, the button is disabled by setting its disabled attribute to true.
+        Overall, this code allows users to load and display more books by clicking the "Show more" button. 
+        It manages the page number to load the appropriate books and provides
+        a smooth user experience by using a DocumentFragment to append the book previews efficiently.
+     */
     const dataListButton = document.querySelector('[data-list-button]');
     if (dataListButton) {
         const totalBooks = books.length;
@@ -185,33 +261,68 @@ function loadMoreBooks() {
 
 
 
+
 /** ===========================================  Create genres ================================================ */
 
 
+/**
+ * This line creates an empty DocumentFragment called genresFragment. 
+ * A DocumentFragment is a lightweight container to hold a group of DOM nodes without adding them to the main DOM tree. 
+ * It is used here to efficiently construct multiple DOM elements before adding them to the actual DOM.
+ */
 const genresFragment = document.createDocumentFragment();
 
-// Create the initial option for 'All Genres'
+/**
+ * This block of code creates an <option> element representing the "All Genres" option and appends it to 
+ * the genresFragment. 
+ * The value attribute is set to 'any', and the text content inside the <option> is set to 'All Genres'.
+ */
 const allGenresOption = document.createElement('option');
 allGenresOption.value = 'any';
 allGenresOption.innerText = 'All Genres';
 genresFragment.appendChild(allGenresOption);
 
-// Assuming 'genres' is an object containing genre options as key-value pairs
+
+
+/**
+ * This line converts the genres object into an array of arrays (genresEntries), 
+ * where each inner array contains a key-value pair from the genres object. 
+ * Each key-value pair represents a genre's id and name.
+ */
 const genresEntries = Object.entries(genres);
 
+
+
+/**
+ * This for...of loop iterates through each [id, name] pair in genresEntries. 
+ * For each genre, it creates a new <option> element and sets its value attribute to the id 
+ * and the text content to the name. 
+ * Then, it appends each genre <option> to the genresFragment.
+ */
 for (const [id, name] of genresEntries) {
-    // Create a new option element for each genre
+
     const genreOption = document.createElement('option');
     genreOption.value = id;
     genreOption.innerText = name;
     genresFragment.appendChild(genreOption);
 }
 
-// Assuming 'data-list-genres' is the ID or selector of the select element where you want to append the genre options
+
+/**
+ * This line retrieves the reference to the HTML <select> element with the attribute data-list-genres. 
+ * This element represents the select box where the genre options will be appended.
+ */
 const genresSelect = document.querySelector('[data-list-genres]');
 
-// Append the genre options to the select element
+
+
+/**
+ * This block of code appends the genre options to the select box (genresSelect). 
+ * First, it clears the select box by setting its innerHTML to an empty string, effectively removing any existing options. 
+ * Then it appends the "All Genres" option (allGenresOption) and the genre options from the genresFragment to the select box.
+ */
 if (genresSelect) {
+
     // Clear the select element first to remove any existing options
     genresSelect.innerHTML = '';
 
@@ -220,10 +331,21 @@ if (genresSelect) {
     genresSelect.appendChild(genresFragment);
 }
 
-// Assuming 'data-search-genres' is the ID or selector of the select element where you want to append the genre options
+
+/**
+ * This line retrieves the reference to the HTML element with the attribute data-search-genres. 
+ * This element represents the select box in the search area where the genre options will be appended.
+ */
 const searchGenresContainer = document.querySelector('[data-search-genres]');
 
-// Append the genre options to the search select element
+
+
+/**
+ * This block of code does the same as the previous block, 
+ * but for the select box in the search area (searchGenresContainer). 
+ * It clears the select box and appends the "All Genres" option and the genre options 
+ * from the genresFragment to the search select box.
+ */
 if (searchGenresContainer) {
     // Clear the select element first to remove any existing options
     searchGenresContainer.innerHTML = '';
@@ -241,19 +363,43 @@ if (searchGenresContainer) {
 
 
 
-/** =============================================== data-search-authors ====================================  */
 
+/** =============================================== data-search-authors ==========================================  */
+
+/**
+ * This line creates an empty DocumentFragment called authorsFragment. Like the previous examples, a DocumentFragment
+ */
 const authorsFragment = document.createDocumentFragment();
 
-// Create the initial option for 'All Authors'
+
+
+/**
+ * This block of code creates an <option> element representing the "All Authors" 
+ * option and appends it to the authorsFragment. 
+ * The value attribute is set to 'any', and the text content inside the <option> is set to 'All Authors'.
+ */
 const allAuthorsOption = document.createElement('option');
 allAuthorsOption.value = 'any';
 allAuthorsOption.innerText = 'All Authors';
 authorsFragment.appendChild(allAuthorsOption);
 
-// Assuming 'authors' is an object containing author options as key-value pairs
+
+
+/**
+ * This line converts the authors object into an array of arrays (authorsEntries), 
+ * where each inner array contains a key-value pair from the authors object. 
+ * Each key-value pair represents an author's id and name.
+ */
 const authorsEntries = Object.entries(authors);
 
+
+
+/**
+ * This for...of loop iterates through each [id, name] pair in authorsEntries. 
+ * For each author, it creates a new <option> element and sets its value attribute to the id, 
+ * and the text content to the name.
+ * Then, it appends each author <option> to the authorsFragment.
+ */
 for (const [id, name] of authorsEntries) {
     // Create a new option element for each author
     const authorOption = document.createElement('option');
@@ -262,10 +408,22 @@ for (const [id, name] of authorsEntries) {
     authorsFragment.appendChild(authorOption);
 }
 
-// Assuming 'data-list-authors' is the ID or selector of the select element where you want to append the author options
+
+
+/**
+ * This line retrieves the reference to the HTML <select> element with the attribute data-list-authors. 
+ * This element represents the select box where the author options will be appended.
+ */
 const authorsSelect = document.querySelector('[data-list-authors]');
 
-// Append the author options to the select element
+
+
+/**
+ * This block of code appends the author options to the select box (authorsSelect). 
+ * First, it clears the select box by setting its innerHTML to an empty string, 
+ * effectively removing any existing options. Then, it appends the "All Authors" option 
+ * (allAuthorsOption) and the author options from the authorsFragment to the select box.
+ */
 if (authorsSelect) {
     // Clear the select element first to remove any existing options
     authorsSelect.innerHTML = '';
@@ -275,10 +433,19 @@ if (authorsSelect) {
     authorsSelect.appendChild(authorsFragment);
 }
 
-// Assuming 'data-search-authors' is the ID or selector of the select element where you want to append the author options
+
+/**
+ * This line retrieves the reference to the HTML element with the attribute data-search-authors. 
+ * This element represents the select box in the search area where the author options will be appended.
+ */
 const searchAuthorsSelect = document.querySelector('[data-search-authors]');
 
-// Append the author options to the search select element
+
+
+/**
+ * This block of code does the same as the previous block, but for the select box in the search area (searchAuthorsSelect). 
+ * It clears the select box and appends the "All Authors" option and the author options from the authorsFragment to the search select box.
+ */
 if (searchAuthorsSelect) {
     // Clear the select element first to remove any existing options
     searchAuthorsSelect.innerHTML = '';
@@ -297,38 +464,31 @@ if (searchAuthorsSelect) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** ================================================= Theme Settings ================================================= */
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Get the theme setting value from the form
-    const dataSettingsTheme = document.querySelector('[data-settings-theme]').value;
 
+/**
+ * The event listener waits for the DOM to be fully loaded before executing the enclosed code. 
+ * It starts by checking if the user's device or browser preference is set to dark mode. 
+ * The matchMedia method with the media query string '(prefers-color-scheme: dark)' 
+ * is used to detect if the user prefers dark mode.
+ */
+document.addEventListener('DOMContentLoaded', function () {
     // Check if the user prefers dark mode
     const isDarkModePreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    // Set the theme to either 'night' or 'day' based on user preference
-    const theme = isDarkModePreferred ? 'night' : 'day';
 
-    // Define CSS colors for day and night themes
+    /**
+     * A variable theme is declared and initialized based on the user's dark mode preference. 
+     * If isDarkModePreferred is true, the theme is set to 'night'; otherwise, it's set to 'day'.
+     */
+    let theme = isDarkModePreferred ? 'night' : 'day';
+
+
+    /**
+     * An object themeColors is defined, which contains color values for both day and night themes. 
+     * Each theme has two color values, dark and light, represented as RGB values.
+     */
     const themeColors = {
         day: {
             dark: '10, 10, 20',
@@ -340,6 +500,116 @@ document.addEventListener('DOMContentLoaded', function () {
         },
     };
 
+    /**
+     * This is a function named toggleTheme responsible for toggling between the day and night themes. 
+     * It changes the theme variable based on its current value. Then it updates the CSS variables --color-dark 
+     * and --color-light on the documentElement (HTML root element) to apply the selected theme's colors.
+     */
+    function toggleTheme() {
+        theme = theme === 'day' ? 'night' : 'day';
+        document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
+        document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
+    }
+
+
+
+    /**
+     * This function showThemeSelectionDialog is called when the user clicks on the element with the attribute 
+     * [data-header-settings]. It retrieves references to the theme selection dialog, overlay buttons, 
+     * and the "No results found" message element using document.querySelector.
+     */
+    function showThemeSelectionDialog() {
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        const overlayButtons = document.querySelector('.overlay__buttons');
+        const dataListMessage = document.querySelector('[data-list-message]');
+
+
+        /**
+         * If all the required elements are found (themeDialog, overlayButtons, and dataListMessage), 
+         * this block of code hides the "No results found" message and shows the overlay buttons (cancel and save buttons). 
+         * Finally, it displays the theme selection dialog using the showModal method.
+         */
+        if (themeDialog && overlayButtons && dataListMessage) {
+            // Hide the "No results found" message
+            dataListMessage.style.display = 'none';
+
+            // Show the overlay buttons
+            overlayButtons.style.display = 'flex';
+
+            // Show the theme selection dialog
+            themeDialog.showModal();
+        }
+    }
+
+    /**
+     * This function handleThemeSelectionAndSave is called when the user submits the theme selection form. 
+     * It prevents the default form submission behavior (event.preventDefault()), retrieves the selected theme value, 
+     * and saves it to the local storage. Then, it updates the theme variable and applies the selected theme colors 
+     * to the CSS variables. 
+     * Finally, it closes the theme selection dialog using themeDialog.close().
+     */
+    function handleThemeSelectionAndSave(event) {
+        event.preventDefault();
+
+        const selectedTheme = document.querySelector('[data-settings-theme]').value;
+        if (selectedTheme === 'day' || selectedTheme === 'night') {
+            // Save the user's theme preference to local storage
+            localStorage.setItem('themePreference', selectedTheme);
+
+            // Update the theme based on the user's selection
+            theme = selectedTheme;
+            document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
+            document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
+        }
+
+        // Close the theme selection dialog
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        themeDialog.close();
+    }
+
+
+    /**
+     * This function handleCancelButtonClick is called when the user clicks on the cancel button in the theme selection dialog.
+     * It prevents the default button
+     */
+    function handleCancelButtonClick(event) {
+        event.preventDefault();
+        const themeDialog = document.querySelector('[data-settings-overlay]');
+        themeDialog.close();
+    }
+
+
+    /**
+     * This code retrieves the reference to the element with the attribute [data-header-settings] 
+     * (presumably a settings icon or button). If found, it attaches the showThemeSelectionDialog function to its click event. 
+     * This means that when the user clicks on the settings icon/button, the theme selection dialog will be shown.
+     */
+    const dataHeaderSettings = document.querySelector('[data-header-settings]');
+
+    // Attach the toggleTheme function to the data-header-settings element's click event
+    if (dataHeaderSettings) {
+        dataHeaderSettings.addEventListener('click', showThemeSelectionDialog);
+    }
+
+
+    /**
+     * 
+     */
+    const themeSelectionForm = document.querySelector('[data-settings-form]');
+
+    // Attach the handleThemeSelectionAndSave function to the form's submit event
+    if (themeSelectionForm) {
+        themeSelectionForm.addEventListener('submit', handleThemeSelectionAndSave);
+    }
+
+    // Get the cancel button
+    const cancelButton = document.querySelector('[data-cancel-button]');
+
+    // Attach the handleCancelButtonClick function to the cancel button's click event
+    if (cancelButton) {
+        cancelButton.addEventListener('click', handleCancelButtonClick);
+    }
+
     // Apply the selected theme colors to the document
     document.documentElement.style.setProperty('--color-dark', themeColors[theme].dark);
     document.documentElement.style.setProperty('--color-light', themeColors[theme].light);
@@ -349,13 +619,40 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dataListButton) {
         const remainingBooks = books.length - (page * BOOKS_PER_PAGE);
         const remainingText = remainingBooks > 0 ? remainingBooks : 0;
+
+        // Set the innerHTML of the "Show more" button with the remaining books count
         dataListButton.innerHTML = `<span>Show more</span><span class="list__remaining">(${remainingText})</span>`;
+
+        // Disable the "Show more" button if there are no remaining books
         dataListButton.disabled = !(remainingBooks > 0);
 
         // Attach the loadMoreBooks function to the "Show more" button's click event
         dataListButton.addEventListener('click', loadMoreBooks);
     }
+
 });
+
+
+
+/** ============================================= data-settings-form =============================================== */
+
+const settingsForm = document.querySelector('[data-settings-form]');
+
+function handleSettingsFormSubmit(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+}
+
+settingsForm.addEventListener('submit', handleSettingsFormSubmit);
+
+const searchForm = document.querySelector('[data-search-form]');
+
+// Add an event listener to the search form's submit button
+searchForm.addEventListener('submit', handleSearchFormSubmit);
+
+
+
+
+
 
 
 
@@ -376,17 +673,8 @@ searchCancelButton.addEventListener('click', handleSearchCancelButtonClick);
 
 
 
-/** ========================================== data-settings-form ==================================== */
 
-const settingsForm = document.querySelector('[data-settings-form]');
 
-function handleSettingsFormSubmit(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-    // Your code to handle the form submission goes here
-    actions.settings.submit(); // Call the function to handle form submission
-}
-
-settingsForm.addEventListener('submit', handleSettingsFormSubmit);
 
 
 /** ========================================== data-list-close ==================================== */
@@ -500,6 +788,9 @@ document.querySelector('[data-header-search]').addEventListener('click', functio
 
 
 
+
+
+
 /** =========================================== data-search-form ============================================= */
 
 function handleSearchFormSubmit(event) {
@@ -514,7 +805,6 @@ function handleSearchFormSubmit(event) {
         let genreMatch = true;
 
         if (filters.genre !== 'any') {
-
             genreMatch = book.genres.includes(filters.genre);
         }
 
@@ -527,12 +817,14 @@ function handleSearchFormSubmit(event) {
     updateBookList(results);
 }
 
+
 // Implement the function to update the book list
 function updateBookList(results) {
     // Get references to the required elements
     const dataListItems = document.querySelector('[data-list-items]');
     const dataListButton = document.querySelector('[data-list-button]');
     const dataSearchOverlay = document.querySelector('[data-search-overlay]');
+    const dataListMessage = document.querySelector('[data-list-message]');
 
     // Calculate the remaining books count to be displayed in the 'Show more' button
     const remainingBooks = results.length - (page * BOOKS_PER_PAGE);
@@ -578,6 +870,17 @@ function updateBookList(results) {
     // Append the fragment to the 'data-list-items' container
     dataListItems.appendChild(fragment);
 
+    // Show or hide the "No results found" message based on the presence of search results
+    if (dataListMessage) {
+        dataListMessage.style.display = results.length === 0 ? 'block' : 'none';
+    }
+
+    // Show or hide the overlay buttons based on the presence of search results
+    if (dataListButton && dataListMessage) {
+        dataListButton.style.display = results.length > 0 ? 'block' : 'none';
+        dataListMessage.style.display = results.length === 0 ? 'block' : 'none';
+    }
+
     // Scroll to the top of the page smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -586,33 +889,6 @@ function updateBookList(results) {
         dataSearchOverlay.open = false;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -668,24 +944,6 @@ document.querySelector('[data-search-overlay]').open = false;
 
 
 
-
-
-/** =============================================== data - settings - overlay.submit ===============================  */
-
-document.querySelector('[data-settings-overlay]').addEventListener('submit', function (event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const result = Object.fromEntries(formData);
-    document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-    document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-    document.querySelector('[data-settings-overlay]').open = false;
-});
-
-
-
-
-
-
 /** ============================================= data-list-items ==================================================== */
 
 document.querySelector('[data-list-items]').addEventListener('click', function (event) {
@@ -733,4 +991,3 @@ document.querySelector('[data-list-items]').addEventListener('click', function (
         dataListDescription.textContent = active.description;
     }
 });
-
