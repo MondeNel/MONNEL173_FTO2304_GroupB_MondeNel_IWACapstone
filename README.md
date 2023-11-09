@@ -20,7 +20,13 @@ Reading Challenges: Set reading goals and participate in challenges to motivate 
 
 User-Friendly Interface: BookConnect is designed for ease of use. Enjoy a responsive and visually appealing interface for a seamless reading experience.
 
+
+### Light Theme
 ![bookConnect Screenshot](https://github.com/MondeNel/MONNEL173_FTO2304_GroupB_MondeNel_IWACapstone/raw/1e6d691e7d7b6d702e683580324be1cc816a439c/Screenshot%20(10).png)
+
+### Dark Theme
+![bookConnect Dark Theme Screenshot](https://github.com/MondeNel/MONNEL173_FTO2304_GroupB_MondeNel_IWACapstone/raw/dcc344a2c607ec7b6dfd796dfdbbaf4e081969ce/Screenshot%20(12).png)
+
 
 
 Technologies Used:
