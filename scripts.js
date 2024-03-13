@@ -228,6 +228,7 @@ if (searchAuthorsSelect) {
 
 
 
+
 /** ================================================= Theme Settings ================================================= */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -484,7 +485,12 @@ function handleSearchFormSubmit(event) {
 
     // Call the function to update the book list with the filtered results
     updateBookList(results);
+
+    // Display the book titles while the user types
+    const titleResults = results.map(book => book.title);
+    infuse.collection('bookTitles').set(titleResults);
 }
+
 
 
 // Implement the function to update the book list
