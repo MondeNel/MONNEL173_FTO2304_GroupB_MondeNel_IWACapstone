@@ -16,6 +16,20 @@ if (!range || range.length < 2) throw new Error('Range must be an array with two
 
 
 
+
+
+// Get the SVG element
+const headerText = document.querySelector('.header__text');
+
+// Add a click event listener
+headerText.addEventListener('click', () => {
+  // Refresh the page
+  location.reload();
+});
+
+
+
+
 /** ===================================== Create Preview Elements ============================================*/
 
 function createPreview(bookData) {
